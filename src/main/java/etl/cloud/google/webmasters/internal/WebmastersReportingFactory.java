@@ -11,6 +11,8 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.util.Utils;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
@@ -40,6 +42,11 @@ public class WebmastersReportingFactory {
         // Create Webmasters client.
         return new Webmasters.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
+                .setHttpRequestInitializer(request -> {
+                    credential.initialize(request);
+                    request.setConnectTimeout(CONNECT_TIMEOUT);
+                    request.setReadTimeout(READ_TIMEOUT);
+                })
                 .build();
     }
 
@@ -48,6 +55,9 @@ public class WebmastersReportingFactory {
 
     private static final HttpTransport HTTP_TRANSPORT = Utils.getDefaultTransport();
     private static final JsonFactory JSON_FACTORY = Utils.getDefaultJsonFactory();
+
+    private static final int CONNECT_TIMEOUT = 60 * 60 * 1000;
+    private static final int READ_TIMEOUT = 60 * 60 * 1000;
 
     /**
     * Authorizes the installed application to access user's protected data.
