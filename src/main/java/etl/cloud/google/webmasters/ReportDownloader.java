@@ -24,9 +24,11 @@ public class ReportDownloader {
                 .setStartDate(startDate)
                 .setEndDate(endDate);
 
-        service.searchanalytics()
-                .query(siteUrl, content)
-                .executeAndDownloadTo(new FileOutputStream(new File(outputFile)));
+        try (FileOutputStream fos = new FileOutputStream(new File(outputFile))) {
+            service.searchanalytics()
+                    .query(siteUrl, content)
+                    .executeAndDownloadTo(fos);
+        }
     }
 
     private Webmasters service;
